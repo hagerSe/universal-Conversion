@@ -1,0 +1,122 @@
+.container {
+  max-width: 500px;
+  margin: 3rem auto;
+  padding: 2rem 2.5rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #e0f7fa, #80deea);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  color: #2a2c2c;
+}
+
+.formColumn {
+  width: 300px;   /* fixed container width */
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  text-align: center;
+  font-size: 2.2rem;
+  margin-bottom: 2rem;
+  font-weight: 700;
+  text-shadow: 1px 1px 3px #f84606;
+}
+
+.label {
+  width: 100%; /* label fills container */
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: #1406d9;
+}
+
+
+.select,
+.input {
+  width: 100%; /* input fills container width */
+  padding: 10px 14px;
+  font-size: 1.15rem;
+  border-radius: 8px;
+  border: 2px solid #00796b;
+  outline: none;
+  margin-bottom: 1.5rem;
+  transition: border-color 0.3s ease;
+  background-color: white;
+}
+
+
+.select:hover,
+.input:hover,
+.select:focus,
+.input:focus {
+  border-color: #004d40;
+}
+
+.flexRow {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.flexRow > div {
+  flex: 1;
+}
+
+.button {
+  width: 50%;
+  padding: 10px 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  background-color: #00796b;
+  color: #e0f2f1;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 121, 107, 0.6);
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.button:hover {
+  background-color: #004d40;
+}
+
+.result {
+  margin-top: 1.5rem;
+  font-weight: 700;
+  font-size: 1.45rem;
+  text-align: center;
+  background: #b2dfdb;
+  padding: 1rem;
+  border-radius: 10px;
+  box-shadow: inset 0 0 10px #004d40aa;
+  user-select: text;
+}
+
+.briefResult {
+  margin-top: 1.25rem;
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-align: center;
+  color: #00695c;
+}
+
+/* 🔴 Step text color changed to RED */
+.steps {
+  margin-top: 1rem;
+  background: #e0f2f1;
+  padding: 1rem;
+  font-family: monospace;
+  white-space: pre-wrap;
+  border-radius: 10px;
+  color: red;  /* changed here */
+  box-shadow: inset 0 0 14px #004d4055;
+  user-select: text;
+}
+
+.error {
+  color: red;
+  font-weight: 700;
+  margin-top: 1rem;
+  text-align: center;
+}
