@@ -31,6 +31,12 @@ const departments = {
  ***************************************/
 const numberRe = /^[-+]?\d*\.?\d+(e[-+]?\d+)?$/i;
 const toBase = (v, u, dep) => v * dep.units[u];
+const numbers = [1, 2, 3, 4];
+
+numbers.map((v: number) => {
+  return v * 2;
+});
+
 const fromBase = (v, u, dep) => v / dep.units[u];
 const convertTemp = (v, f, t) => {
   let C = f === "C" ? v : f === "F" ? (v - 32) * 5/9 : v - 273.15;
