@@ -24,7 +24,10 @@ const departments = {
   Power: { base: "W", allowNegative: false, units: { W: 1, kW: 1e3, MW: 1e6, hp: 745.7 } },
   Frequency: { base: "Hz", allowNegative: false, units: { Hz: 1, kHz: 1e3, MHz: 1e6, GHz: 1e9, rpm: 1/60 } },
   Density: { base: "kg/m³", allowNegative: false, units: { "kg/m³": 1, "g/cm³": 1e3, "lb/ft³": 16.0185 } },
-};
+} as const;
+
+// Type of department keys
+type DepartmentKey = keyof typeof departments;
 
 /***************************************
  * Helpers
@@ -32,32 +35,32 @@ const departments = {
 const numberRe = /^[-+]?\d*\.?\d+(e[-+]?\d+)?$/i;
 const toBase = (v: number, u: string, dep: { units: Record<string, number> }) => v * dep.units[u];
 
-const numbers = [1, 2, 3, 4];
-
-numbers.map((v: number) => {
-  return v * 2;
-});
-
 const fromBase = (v: number, u: string, dep: { units: Record<string, number> }) => v / dep.units[u];
-const convertTemp = (v, f, t) => {
-  let C = f === "C" ? v : f === "F" ? (v - 32) * 5/9 : v - 273.15;
-  return t === "C" ? C : t === "F" ? C * 9/5 + 32 : C + 273.15;
+
+const convertTemp = (v: number, f: string, t: string): number => {
+  let C = f === "C" ? v : f === "F" ? (v - 32) * 5 / 9 : v - 273.15;
+  return t === "C" ? C : t === "F" ? C * 9 / 5 + 32 : C + 273.15;
 };
 
 export default function Page() {
-  const [dept, setDept] = useState("Length");
+  const [dept, setDept] = useState<DepartmentKey>("Length");
+
   const initUnits = Object.keys(departments.Length.units);
   const [from, setFrom] = useState(initUnits[0]);
   const [to, setTo] = useState(initUnits[1]);
   const [input, setInput] = useState("");
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<string | null>(null);
   const [stepTxt, setStepTxt] = useState("");
   const [err, setErr] = useState("");
 
-  const unitKeys = dept === "Temperature" ? departments.Temperature.units : Object.keys(departments[dept].units);
+  const unitKeys = dept === "Temperature"
+    ? departments.Temperature.units as string[]
+    : Object.keys(departments[dept].units);
 
-  const resetUnits = (d) => {
-    const keys = d === "Temperature" ? departments.Temperature.units : Object.keys(departments[d].units);
+  const resetUnits = (d: DepartmentKey) => {
+    const keys = d === "Temperature"
+      ? departments.Temperature.units as string[]
+      : Object.keys(departments[d].units);
     setFrom(keys[0]);
     setTo(keys[1] || keys[0]);
   };
@@ -81,16 +84,16 @@ export default function Page() {
     if (dept === "Temperature") {
       const res = convertTemp(num, from, to);
       setResult(`${res.toFixed(4)} ${to}`);
-      setStepTxt(`**Step 1**: Convert **${num} ${from}** to Celsius.\n**Step 2**: Convert Celsius to **${to}**.`);
+      setStepTxt(`**Step 1**: Convert **${num} ${from}** to Celsius.<br>**Step 2**: Convert Celsius to **${to}**.`);
       return;
     }
 
     const dep = departments[dept];
     const baseVal = toBase(num, from, dep);
     const finalVal = fromBase(baseVal, to, dep);
-    const steps = `**Step 1**: 1 ${from} = ${dep.units[from]} ${dep.base}.\n` +
-      `**Step 2**: **${num} ${from}** = ${num} × ${dep.units[from]} = ${baseVal} ${dep.base}.\n` +
-      `**Step 3**: 1 ${to} = ${dep.units[to]} ${dep.base}.\n` +
+    const steps = `**Step 1**: 1 ${from} = ${dep.units[from]} ${dep.base}.<br>` +
+      `**Step 2**: **${num} ${from}** = ${num} × ${dep.units[from]} = ${baseVal} ${dep.base}.<br>` +
+      `**Step 3**: 1 ${to} = ${dep.units[to]} ${dep.base}.<br>` +
       `**Step 4**: ${baseVal} ÷ ${dep.units[to]} = **${finalVal} ${to}**`;
     setResult(`${finalVal.toFixed(6)} ${to}`);
     setStepTxt(steps);
@@ -101,29 +104,66 @@ export default function Page() {
       <h1 className={styles.title}>🌐 Universal Converter</h1>
 
       <label className={styles.label}>Department</label>
-      <select className={styles.select} value={dept} onChange={(e) => { setDept(e.target.value); resetUnits(e.target.value); setInput(""); setResult(null); setStepTxt(""); setErr(""); }}>
-        {Object.keys(departments).map((d) => <option key={d}>{d}</option>)}
+      <select
+        className={styles.select}
+        value={dept}
+        onChange={(e) => {
+          const selected = e.target.value as DepartmentKey;
+          setDept(selected);
+          resetUnits(selected);
+          setInput("");
+          setResult(null);
+          setStepTxt("");
+          setErr("");
+        }}
+      >
+        {Object.keys(departments).map((d) => (
+          <option key={d} value={d}>
+            {d}
+          </option>
+        ))}
       </select>
 
       <label className={styles.label}>Enter value</label>
-      <input className={styles.input} value={input} onChange={(e) => setInput(e.target.value)} />
+      <input
+        className={styles.input}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+      />
 
       <label className={styles.label}>From Unit</label>
       <select className={styles.select} value={from} onChange={(e) => setFrom(e.target.value)}>
-        {unitKeys.map((u) => <option key={u}>{u}</option>)}
+        {unitKeys.map((u) => (
+          <option key={u} value={u}>
+            {u}
+          </option>
+        ))}
       </select>
 
       <label className={styles.label}>To Unit</label>
       <select className={styles.select} value={to} onChange={(e) => setTo(e.target.value)}>
-        {unitKeys.map((u) => <option key={u}>{u}</option>)}
+        {unitKeys.map((u) => (
+          <option key={u} value={u}>
+            {u}
+          </option>
+        ))}
       </select>
 
-      <button className={styles.button} onClick={handleConvert}>Convert</button>
+      <button className={styles.button} onClick={handleConvert}>
+        Convert
+      </button>
 
       {err && <p className={styles.error}>{err}</p>}
-      {result && <p className={styles.result}>Result: <strong>{result}</strong></p>}
+      {result && (
+        <p className={styles.result}>
+          Result: <strong>{result}</strong>
+        </p>
+      )}
       {stepTxt && (
-        <div className={styles.steps} dangerouslySetInnerHTML={{ __html: stepTxt.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') }} />
+        <div
+          className={styles.steps}
+          dangerouslySetInnerHTML={{ __html: stepTxt }}
+        />
       )}
     </div>
   );
