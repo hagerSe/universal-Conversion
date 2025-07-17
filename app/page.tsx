@@ -10,7 +10,25 @@ interface Department {
   units: Record<string, number> | readonly string[];
 }
 
-type DepartmentKey = keyof typeof departments;
+// Explicitly define DepartmentKey to avoid circular reference
+type DepartmentKey =
+  | "Length"
+  | "Mass"
+  | "Time"
+  | "Temperature"
+  | "ElectricCurrent"
+  | "AmountOfSubstance"
+  | "LuminousIntensity"
+  | "Area"
+  | "Volume"
+  | "Pressure"
+  | "Speed"
+  | "Acceleration"
+  | "Force"
+  | "Energy"
+  | "Power"
+  | "Frequency"
+  | "Density";
 
 /***************************************
  * Departments (17)
@@ -63,7 +81,7 @@ export default function Page() {
   const [stepTxt, setStepTxt] = useState("");
   const [err, setErr] = useState("");
 
-  // Fix: Spread the readonly array for Temperature, use keyof for safe indexing
+  // Spread the readonly array for Temperature
   const unitKeys = dept === "Temperature" ? [...departments.Temperature.units] : Object.keys(departments[dept].units);
 
   const resetUnits = (d: DepartmentKey) => {
