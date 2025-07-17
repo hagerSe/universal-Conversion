@@ -197,4 +197,7 @@ export default function Home() {
       </div>
     </div>
   );
+  // Add this comment somewhere near the top:
+console.log("Force redeploy test");
+
 }
