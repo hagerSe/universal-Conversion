@@ -30,6 +30,14 @@ type DepartmentKey =
   | "Frequency"
   | "Density";
 
+interface Conversion {
+  input: number;
+  from: string;
+  to: string;
+  result: string;
+  department: DepartmentKey;
+}
+
 /***************************************
  * Departments (17)
  ***************************************/
@@ -64,6 +72,11 @@ numbers.map((v: number) => {
   return v * 2;
 });
 
+// Type guard to check if units is an array
+const isUnitArray = (units: Department['units']): units is readonly string[] => {
+  return Array.isArray(units);
+};
+
 const toBase = (v: number, u: string, dep: { units: Record<string, number> }) => v * dep.units[u];
 const fromBase = (v: number, u: string, dep: { units: Record<string, number> }) => v / dep.units[u];
 const convertTemp = (v: number, f: string, t: string) => {
@@ -73,24 +86,35 @@ const convertTemp = (v: number, f: string, t: string) => {
 
 export default function Page() {
   const [dept, setDept] = useState<DepartmentKey>("Length");
-  const initUnits = Object.keys(departments.Length.units);
+  const initUnits = isUnitArray(departments.Length.units) ? [...departments.Length.units] : Object.keys(departments.Length.units);
   const [from, setFrom] = useState<string>(initUnits[0]);
-  const [to, setTo] = useState<string>(initUnits[1]);
+  const [to, setTo] = useState<string>(initUnits[1] || initUnits[0]);
   const [input, setInput] = useState("");
   const [result, setResult] = useState<string | null>(null);
   const [stepTxt, setStepTxt] = useState("");
   const [err, setErr] = useState("");
+  const [history, setHistory] = useState<Conversion[]>([]);
 
-  // Spread the readonly array for Temperature
-  const unitKeys = dept === "Temperature" ? [...departments.Temperature.units] : Object.keys(departments[dept].units);
+  // Fix: Use type guard to safely handle units union type
+  const unitKeys = isUnitArray(departments[dept].units)
+    ? [...departments[dept].units]
+    : Object.keys(departments[dept].units);
 
   const resetUnits = (d: DepartmentKey) => {
-    const keys = d === "Temperature" ? [...departments.Temperature.units] : Object.keys(departments[d].units);
+    const keys = isUnitArray(departments[d].units)
+      ? [...departments[d].units]
+      : Object.keys(departments[d].units);
     setFrom(keys[0]);
     setTo(keys[1] || keys[0]);
   };
 
   const handleConvert = () => {
+    if (from === to) {
+      setErr("❌ 'From' and 'To' units must be different.");
+      setResult(null);
+      setStepTxt("");
+      return;
+    }
     if (!numberRe.test(input.trim())) {
       setErr("❌ Enter a valid number – letters are not allowed.");
       setResult(null);
@@ -106,22 +130,27 @@ export default function Page() {
     }
     setErr("");
 
+    let resultStr: string;
+    let steps: string;
+
     if (dept === "Temperature") {
       const res = convertTemp(num, from, to);
-      setResult(`${res.toFixed(4)} ${to}`);
-      setStepTxt(`**Step 1**: Convert **${num} ${from}** to Celsius.\n**Step 2**: Convert Celsius to **${to}**.`);
-      return;
+      resultStr = `${res.toFixed(4)} ${to}`;
+      steps = `**Step 1**: Convert **${num} ${from}** to Celsius.\n**Step 2**: Convert Celsius to **${to}**.`;
+    } else {
+      const dep = departments[dept];
+      const baseVal = toBase(num, from, dep as { units: Record<string, number> });
+      const finalVal = fromBase(baseVal, to, dep as { units: Record<string, number> });
+      resultStr = `${finalVal.toFixed(6)} ${to}`;
+      steps = `**Step 1**: 1 ${from} = ${(dep.units as Record<string, number>)[from]} ${dep.base}.\n` +
+        `**Step 2**: **${num} ${from}** = ${num} × ${(dep.units as Record<string, number>)[from]} = ${baseVal} ${dep.base}.\n` +
+        `**Step 3**: 1 ${to} = ${(dep.units as Record<string, number>)[to]} ${dep.base}.\n` +
+        `**Step 4**: ${baseVal} ÷ ${(dep.units as Record<string, number>)[to]} = **${finalVal} ${to}**`;
     }
 
-    const dep = departments[dept];
-    const baseVal = toBase(num, from, dep as { units: Record<string, number> });
-    const finalVal = fromBase(baseVal, to, dep as { units: Record<string, number> });
-    const steps = `**Step 1**: 1 ${from} = ${(dep.units as Record<string, number>)[from]} ${dep.base}.\n` +
-      `**Step 2**: **${num} ${from}** = ${num} × ${(dep.units as Record<string, number>)[from]} = ${baseVal} ${dep.base}.\n` +
-      `**Step 3**: 1 ${to} = ${(dep.units as Record<string, number>)[to]} ${dep.base}.\n` +
-      `**Step 4**: ${baseVal} ÷ ${(dep.units as Record<string, number>)[to]} = **${finalVal} ${to}**`;
-    setResult(`${finalVal.toFixed(6)} ${to}`);
+    setResult(resultStr);
     setStepTxt(steps);
+    setHistory([...history, { input: num, from, to, result: resultStr, department: dept }]);
   };
 
   return (
@@ -167,6 +196,21 @@ export default function Page() {
         Convert
       </button>
 
+      <button
+        className={styles.button}
+        onClick={() => {
+          setDept("Length");
+          resetUnits("Length");
+          setInput("");
+          setResult(null);
+          setStepTxt("");
+          setErr("");
+          setHistory([]);
+        }}
+      >
+        Reset
+      </button>
+
       {err && <p className={styles.error}>{err}</p>}
       {result && (
         <p className={styles.result}>
@@ -175,6 +219,19 @@ export default function Page() {
       )}
       {stepTxt && (
         <div className={styles.steps} dangerouslySetInnerHTML={{ __html: stepTxt.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>") }} />
+      )}
+
+      {history.length > 0 && (
+        <div className={styles.history}>
+          <h2 className={styles.historyTitle}>Conversion History</h2>
+          <ul>
+            {history.map((conv, index) => (
+              <li key={index}>
+                {conv.department}: {conv.input} {conv.from} → {conv.result}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
