@@ -2,8 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
 
-// All departments with units and conversion factors (like before)
-const departments = {
+interface Department {
+  base?: string;
+  allowNegative: boolean;
+  units: Record<string, number> | readonly string[];
+}
+
+const departments: Record<string, Department> = {
   Length: { base: "m", allowNegative: false, units: { km: 1000, m: 1, cm: 0.01, mm: 0.001, mi: 1609.34, yd: 0.9144, ft: 0.3048, in: 0.0254 } },
   Mass: { base: "kg", allowNegative: false, units: { t: 1000, kg: 1, g: 0.001, mg: 1e-6, lb: 0.453592, oz: 0.0283495 } },
   Time: { base: "s", allowNegative: false, units: { yr: 31536000, wk: 604800, day: 86400, hr: 3600, min: 60, s: 1 } },
@@ -23,28 +28,45 @@ const departments = {
   Density: { base: "kg/m³", allowNegative: false, units: { "kg/m³": 1, "g/cm³": 1000, "lb/ft³": 16.0185 } },
 };
 
-const isUnitArray = (units) => Array.isArray(units);
+// Properly typed function
+const isUnitArray = (units: Record<string, number> | readonly string[]): units is readonly string[] => {
+  return Array.isArray(units);
+};
 
-const toBase = (value, unit, dep) => value * dep.units[unit];
-const fromBase = (value, unit, dep) => value / dep.units[unit];
-const convertTemp = (v, from, to) => {
-  let C = from === "C" ? v : from === "F" ? (v - 32) * 5 / 9 : v - 273.15;
-  return to === "C" ? C : to === "F" ? C * 9 / 5 + 32 : C + 273.15;
+const toBase = (value: number, unit: string, dep: Department) => {
+  if (isUnitArray(dep.units)) throw new Error("Cannot convert to base for array units");
+  return value * dep.units[unit];
+};
+
+const fromBase = (value: number, unit: string, dep: Department) => {
+  if (isUnitArray(dep.units)) throw new Error("Cannot convert from base for array units");
+  return value / dep.units[unit];
+};
+
+const convertTemp = (v: number, from: string, to: string): number => {
+  let C: number;
+  if (from === "C") C = v;
+  else if (from === "F") C = (v - 32) * 5 / 9;
+  else C = v - 273.15;
+
+  if (to === "C") return C;
+  else if (to === "F") return C * 9 / 5 + 32;
+  else return C + 273.15;
 };
 
 export default function Home() {
   const departmentKeys = Object.keys(departments);
 
-  const [dept, setDept] = useState("Length");
-  const [input, setInput] = useState("");
-  const [fromUnit, setFromUnit] = useState("");
-  const [toUnit, setToUnit] = useState("");
-  const [result, setResult] = useState(null);
-  const [stepTxt, setStepTxt] = useState("");
-  const [err, setErr] = useState("");
+  const [dept, setDept] = useState<string>("Length");
+  const [input, setInput] = useState<string>("");
+  const [fromUnit, setFromUnit] = useState<string>("");
+  const [toUnit, setToUnit] = useState<string>("");
+  const [result, setResult] = useState<string | null>(null);
+  const [stepTxt, setStepTxt] = useState<string>("");
+  const [err, setErr] = useState<string>("");
 
   useEffect(() => {
-    // When department changes, reset units to first two units available
+    // Reset units when department changes
     const units = departments[dept].units;
     if (isUnitArray(units)) {
       setFromUnit(units[0]);
@@ -81,7 +103,7 @@ export default function Home() {
       return;
     }
 
-    let resStr, steps;
+    let resStr: string, steps: string;
     if (dept === "Temperature") {
       const conv = convertTemp(num, fromUnit, toUnit);
       resStr = `${conv.toFixed(4)} ${toUnit}`;
@@ -171,9 +193,7 @@ export default function Home() {
           </div>
         )}
 
-        {stepTxt && (
-          <pre className={styles.steps}>{stepTxt}</pre>
-        )}
+        {stepTxt && <pre className={styles.steps}>{stepTxt}</pre>}
       </div>
     </div>
   );
