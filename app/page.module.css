@@ -30,7 +30,6 @@
   color: #1406d9;
 }
 
-
 .select,
 .input {
   width: 100%; /* input fills container width */
@@ -43,7 +42,6 @@
   transition: border-color 0.3s ease;
   background-color: white;
 }
-
 
 .select:hover,
 .input:hover,

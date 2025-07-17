@@ -10,7 +10,6 @@ interface Department {
   units: Record<string, number> | readonly string[];
 }
 
-// Explicitly define DepartmentKey to avoid circular reference
 type DepartmentKey =
   | "Length"
   | "Mass"
@@ -72,7 +71,6 @@ numbers.map((v: number) => {
   return v * 2;
 });
 
-// Type guard to check if units is an array
 const isUnitArray = (units: Department['units']): units is readonly string[] => {
   return Array.isArray(units);
 };
@@ -86,7 +84,7 @@ const convertTemp = (v: number, f: string, t: string) => {
 
 export default function Page() {
   const [dept, setDept] = useState<DepartmentKey>("Length");
-  const initUnits = isUnitArray(departments.Length.units) ? [...departments.Length.units] : Object.keys(departments.Length.units);
+  const initUnits = isUnitArray(departments.Length.units) ? [...departments.Length.units] : Object.keys(departments.Length.units || {});
   const [from, setFrom] = useState<string>(initUnits[0]);
   const [to, setTo] = useState<string>(initUnits[1] || initUnits[0]);
   const [input, setInput] = useState("");
@@ -95,20 +93,21 @@ export default function Page() {
   const [err, setErr] = useState("");
   const [history, setHistory] = useState<Conversion[]>([]);
 
-  // Fix: Use type guard to safely handle units union type
   const unitKeys = isUnitArray(departments[dept].units)
     ? [...departments[dept].units]
-    : Object.keys(departments[dept].units);
+    : Object.keys(departments[dept].units || {});
+  console.log("unitKeys:", unitKeys);
 
   const resetUnits = (d: DepartmentKey) => {
     const keys = isUnitArray(departments[d].units)
       ? [...departments[d].units]
-      : Object.keys(departments[d].units);
+      : Object.keys(departments[d].units || {});
     setFrom(keys[0]);
     setTo(keys[1] || keys[0]);
   };
 
   const handleConvert = () => {
+    console.log("Converting:", { from, to, input });
     if (from === to) {
       setErr("❌ 'From' and 'To' units must be different.");
       setResult(null);
@@ -151,65 +150,73 @@ export default function Page() {
     setResult(resultStr);
     setStepTxt(steps);
     setHistory([...history, { input: num, from, to, result: resultStr, department: dept }]);
+    console.log("History updated:", history);
   };
 
   return (
     <div className={styles.container}>
       <h1 className={styles.title}>🌐 Universal Converter</h1>
 
-      <label className={styles.label}>Department</label>
-      <select
-        className={styles.select}
-        value={dept}
-        onChange={(e) => {
-          setDept(e.target.value as DepartmentKey);
-          resetUnits(e.target.value as DepartmentKey);
-          setInput("");
-          setResult(null);
-          setStepTxt("");
-          setErr("");
-        }}
-      >
-        {Object.keys(departments).map((d) => (
-          <option key={d}>{d}</option>
-        ))}
-      </select>
+      <div className={styles.formColumn}>
+        <label className={styles.label}>Department</label>
+        <select
+          className={styles.select}
+          value={dept}
+          onChange={(e) => {
+            setDept(e.target.value as DepartmentKey);
+            resetUnits(e.target.value as DepartmentKey);
+            setInput("");
+            setResult(null);
+            setStepTxt("");
+            setErr("");
+          }}
+        >
+          {Object.keys(departments).map((d) => (
+            <option key={d}>{d}</option>
+          ))}
+        </select>
 
-      <label className={styles.label}>Enter value</label>
-      <input className={styles.input} value={input} onChange={(e) => setInput(e.target.value)} />
+        <label className={styles.label}>Enter value</label>
+        <input className={styles.input} value={input} onChange={(e) => setInput(e.target.value)} />
 
-      <label className={styles.label}>From Unit</label>
-      <select className={styles.select} value={from} onChange={(e) => setFrom(e.target.value)}>
-        {unitKeys.map((u) => (
-          <option key={u}>{u}</option>
-        ))}
-      </select>
+        <div className={styles.flexRow}>
+          <div>
+            <label className={styles.label}>From Unit</label>
+            <select className={styles.select} value={from} onChange={(e) => setFrom(e.target.value)}>
+              {unitKeys.map((u) => (
+                <option key={u}>{u}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={styles.label}>To Unit</label>
+            <select className={styles.select} value={to} onChange={(e) => setTo(e.target.value)}>
+              {unitKeys.map((u) => (
+                <option key={u}>{u}</option>
+              ))}
+            </select>
+          </div>
+        </div>
 
-      <label className={styles.label}>To Unit</label>
-      <select className={styles.select} value={to} onChange={(e) => setTo(e.target.value)}>
-        {unitKeys.map((u) => (
-          <option key={u}>{u}</option>
-        ))}
-      </select>
+        <button className={styles.button} onClick={handleConvert}>
+          Convert
+        </button>
 
-      <button className={styles.button} onClick={handleConvert}>
-        Convert
-      </button>
-
-      <button
-        className={styles.button}
-        onClick={() => {
-          setDept("Length");
-          resetUnits("Length");
-          setInput("");
-          setResult(null);
-          setStepTxt("");
-          setErr("");
-          setHistory([]);
-        }}
-      >
-        Reset
-      </button>
+        <button
+          className={styles.button}
+          onClick={() => {
+            setDept("Length");
+            resetUnits("Length");
+            setInput("");
+            setResult(null);
+            setStepTxt("");
+            setErr("");
+            setHistory([]);
+          }}
+        >
+          Reset
+        </button>
+      </div>
 
       {err && <p className={styles.error}>{err}</p>}
       {result && (
@@ -217,10 +224,7 @@ export default function Page() {
           Result: <strong>{result}</strong>
         </p>
       )}
-      {stepTxt && (
-        <div className={styles.steps} dangerouslySetInnerHTML={{ __html: stepTxt.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>") }} />
-      )}
-
+      {stepTxt && <div className={styles.steps} dangerouslySetInnerHTML={{ __html: stepTxt.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>") }} />}
       {history.length > 0 && (
         <div className={styles.history}>
           <h2 className={styles.historyTitle}>Conversion History</h2>
