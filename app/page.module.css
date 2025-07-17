@@ -1,107 +1,72 @@
 .container {
-  max-width: 500px;
+  max-width: 600px;
   margin: 3rem auto;
   padding: 2rem 2.5rem;
   border-radius: 12px;
   background: linear-gradient(135deg, #e0f7fa, #80deea);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-  color: #2a2c2c;
-}
-
-.formColumn {
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-}
-
-.title {
-  text-align: center;
-  font-size: 2.2rem;
-  margin-bottom: 2rem;
-  font-weight: 700;
-  text-shadow: 1px 1px 3px #f84606;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .label {
-  font-weight: 600;
-  margin-bottom: 0.6rem;
-  color: #1406d9;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #333;
 }
 
-.select,
 .input {
   width: 100%;
-  padding: 10px 14px;
-  font-size: 1.15rem;
-  border-radius: 8px;
-  border: 2px solid #00796b;
-  outline: none;
-  margin-bottom: 1.5rem;
-  background-color: white;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  color: green;
+  font-weight: bold;
 }
 
-.select:hover,
-.input:hover,
-.select:focus,
-.input:focus {
-  border-color: #004d40;
-}
-
-/* Button group: side by side with spacing */
-.buttonGroup {
-  display: flex;
-  justify-content: center;
-  gap: 2rem; /* space between buttons */
-  margin-top: 1.5rem;
+.select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 .button {
-  width: 120px;
-  padding: 10px 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  border: none;
-  border-radius: 12px;
   background-color: #00796b;
-  color: #e0f2f1;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
-  box-shadow: 0 6px 14px rgba(0, 121, 107, 0.6);
-  transition: background-color 0.3s ease;
-  user-select: none;
+  margin-top: 1rem;
 }
 
 .button:hover {
   background-color: #004d40;
 }
 
-.result {
+.outputBox {
   margin-top: 1.5rem;
-  font-weight: 700;
-  font-size: 1.45rem;
-  text-align: center;
-  background: #b2dfdb;
   padding: 1rem;
-  border-radius: 10px;
-  box-shadow: inset 0 0 10px #004d40aa;
-  user-select: text;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
-.steps {
-  margin-top: 1rem;
-  background: #e0f2f1;
-  padding: 1rem;
-  font-family: monospace;
-  white-space: pre-wrap;
-  border-radius: 10px;
-  color: #b71c1c;
-  box-shadow: inset 0 0 14px #004d4055;
-  user-select: text;
+.resultLabel {
+  font-weight: bold;
+  color: #222;
 }
 
-.error {
-  color: #b71c1c;
-  font-weight: 700;
+.resultValue {
+  font-weight: bold;
+  color: #00695c;
+}
+
+.step {
+  color: red;
+  font-size: 0.95rem;
   margin-top: 1rem;
-  text-align: center;
 }

@@ -13,7 +13,7 @@ const departments: Record<string, Department> = {
   Mass: { base: "kg", allowNegative: false, units: { t: 1000, kg: 1, g: 0.001, mg: 1e-6, lb: 0.453592, oz: 0.0283495 } },
   Time: { base: "s", allowNegative: false, units: { yr: 31536000, wk: 604800, day: 86400, hr: 3600, min: 60, s: 1 } },
   Temperature: { allowNegative: true, units: ["C", "F", "K"] },
-  ElectricCurrent: { base: "A", allowNegative: true, units: { kA: 1000, A: 1, mA: 0.001, μA: 0.000001 } },
+  ElectricCurrent: { base: "A", allowNegative: true, units: { kA: 1000, A: 1, mA: 0.001, "μA": 0.000001 } },
   AmountOfSubstance: { base: "mol", allowNegative: false, units: { mol: 1, mmol: 0.001 } },
   LuminousIntensity: { base: "cd", allowNegative: false, units: { cd: 1 } },
   Area: { base: "m²", allowNegative: false, units: { "km²": 1e6, "m²": 1, "cm²": 1e-4, "mm²": 1e-6, acre: 4046.86, "ft²": 0.092903 } },
@@ -28,7 +28,6 @@ const departments: Record<string, Department> = {
   Density: { base: "kg/m³", allowNegative: false, units: { "kg/m³": 1, "g/cm³": 1000, "lb/ft³": 16.0185 } },
 };
 
-// Properly typed function
 const isUnitArray = (units: Record<string, number> | readonly string[]): units is readonly string[] => {
   return Array.isArray(units);
 };
@@ -66,7 +65,6 @@ export default function Home() {
   const [err, setErr] = useState<string>("");
 
   useEffect(() => {
-    // Reset units when department changes
     const units = departments[dept].units;
     if (isUnitArray(units)) {
       setFromUnit(units[0]);
@@ -197,7 +195,4 @@ export default function Home() {
       </div>
     </div>
   );
-  // Add this comment somewhere near the top:
-console.log("Force redeploy test");
-
 }
