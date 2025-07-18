@@ -1,184 +1,283 @@
 'use client';
+
+import Head from 'next/head';
 import React, { useState, useEffect } from 'react';
 import styles from './page.module.css';
 
 interface Department {
-  base?: string;
+  base: string;
   allowNegative: boolean;
-  units: Record<string, number>; // Removed readonly string[] union
+  units: Record<string, number>;
 }
 
 const departments: Record<string, Department> = {
-  Length: { base: "m", allowNegative: false, units: { km: 1000, m: 1, cm: 0.01, mm: 0.001, mi: 1609.34, yd: 0.9144, ft: 0.3048, in: 0.0254 } },
-  Mass: { base: "kg", allowNegative: false, units: { t: 1000, kg: 1, g: 0.001, mg: 1e-6, lb: 0.453592, oz: 0.0283495 } },
-  Time: { base: "s", allowNegative: false, units: { yr: 31536000, wk: 604800, day: 86400, hr: 3600, min: 60, s: 1 } },
-  Temperature: { allowNegative: true, units: { C: 1, F: 1, K: 1 } }, // Dummy values, handled by convertTemp
-  ElectricCurrent: { base: "A", allowNegative: true, units: { kA: 1000, A: 1, mA: 0.001, "μA": 0.000001 } },
-  AmountOfSubstance: { base: "mol", allowNegative: false, units: { mol: 1, mmol: 0.001 } },
-  LuminousIntensity: { base: "cd", allowNegative: false, units: { cd: 1 } },
-  Area: { base: "m²", allowNegative: false, units: { "km²": 1e6, "m²": 1, "cm²": 1e-4, "mm²": 1e-6, acre: 4046.86, "ft²": 0.092903 } },
-  Volume: { base: "m³", allowNegative: false, units: { m3: 1, L: 0.001, mL: 0.000001, "ft³": 0.0283168, "in³": 1.63871e-5 } },
-  Pressure: { base: "Pa", allowNegative: false, units: { Pa: 1, kPa: 1000, bar: 1e5, atm: 101325, psi: 6894.76 } },
-  Speed: { base: "m/s", allowNegative: false, units: { "m/s": 1, kmh: 0.277778, mph: 0.44704, knot: 0.514444, "ft/s": 0.3048 } },
-  Acceleration: { base: "m/s²", allowNegative: false, units: { "m/s²": 1, "ft/s²": 0.3048, g: 9.80665 } },
-  Force: { base: "N", allowNegative: false, units: { N: 1, kN: 1000, dyn: 1e-5, lbf: 4.44822 } },
-  Energy: { base: "J", allowNegative: false, units: { J: 1, kJ: 1000, cal: 4.184, Wh: 3600, eV: 1.60218e-19 } },
-  Power: { base: "W", allowNegative: false, units: { W: 1, kW: 1000, MW: 1e6, hp: 745.7 } },
-  Frequency: { base: "Hz", allowNegative: false, units: { Hz: 1, kHz: 1000, MHz: 1e6, GHz: 1e9, rpm: 1/60 } },
-  Density: { base: "kg/m³", allowNegative: false, units: { "kg/m³": 1, "g/cm³": 1000, "lb/ft³": 16.0185 } },
+  Length: {
+    base: 'm',
+    allowNegative: false,
+    units: { km: 1000, m: 1, cm: 0.01, mm: 0.001, mi: 1609.34, yd: 0.9144, ft: 0.3048, in: 0.0254 },
+  },
+  Mass: {
+    base: 'kg',
+    allowNegative: false,
+    units: { kg: 1, g: 0.001, mg: 0.000001, lb: 0.453592, oz: 0.0283495 },
+  },
+  Time: {
+    base: 's',
+    allowNegative: false,
+    units: { h: 3600, min: 60, s: 1, ms: 0.001 },
+  },
+  'Electric Current': {
+    base: 'A',
+    allowNegative: false,
+    units: { A: 1, mA: 0.001, μA: 0.000001 },
+  },
+  Temperature: {
+    base: 'K',
+    allowNegative: true,
+    units: { C: 1, K: 1, F: 1 },
+  },
+  'Amount of Substance': {
+    base: 'mol',
+    allowNegative: false,
+    units: { mol: 1, mmol: 0.001 },
+  },
+  'Luminous Intensity': {
+    base: 'cd',
+    allowNegative: false,
+    units: { cd: 1 },
+  },
+  Area: {
+    base: 'm²',
+    allowNegative: false,
+    units: { 'km²': 1e6, 'm²': 1, 'cm²': 0.0001, 'mm²': 0.000001 },
+  },
+  Volume: {
+    base: 'm³',
+    allowNegative: false,
+    units: { 'm³': 1, 'cm³': 0.000001, L: 0.001, mL: 0.000001 },
+  },
+  Speed: {
+    base: 'm/s',
+    allowNegative: false,
+    units: { 'm/s': 1, 'km/h': 0.277778, 'mi/h': 0.44704 },
+  },
+  Acceleration: {
+    base: 'm/s²',
+    allowNegative: false,
+    units: { 'm/s²': 1 },
+  },
+  Force: {
+    base: 'N',
+    allowNegative: false,
+    units: { N: 1, kN: 1000, lbf: 4.44822 },
+  },
+  Pressure: {
+    base: 'Pa',
+    allowNegative: false,
+    units: { Pa: 1, kPa: 1000, bar: 1e5, atm: 101325 },
+  },
+  Energy: {
+    base: 'J',
+    allowNegative: false,
+    units: { J: 1, kJ: 1000, cal: 4.184 },
+  },
+  Power: {
+    base: 'W',
+    allowNegative: false,
+    units: { W: 1, kW: 1000, hp: 745.7 },
+  },
+  Voltage: {
+    base: 'V',
+    allowNegative: false,
+    units: { V: 1, mV: 0.001 },
+  },
+  Frequency: {
+    base: 'Hz',
+    allowNegative: false,
+    units: { Hz: 1, kHz: 1000, MHz: 1e6 },
+  },
 };
 
-const toBase = (value: number, unit: string, dep: Department) => {
-  return value * dep.units[unit];
-};
-
-const fromBase = (value: number, unit: string, dep: Department) => {
-  return value / dep.units[unit];
-};
-
-const convertTemp = (v: number, from: string, to: string): number => {
-  let C: number;
-  if (from === "C") C = v;
-  else if (from === "F") C = (v - 32) * 5 / 9;
-  else C = v - 273.15;
-
-  if (to === "C") return C;
-  else if (to === "F") return C * 9 / 5 + 32;
-  else return C + 273.15;
-};
-
-export default function Home() {
-  const departmentKeys = Object.keys(departments);
-
-  const [dept, setDept] = useState<string>("Length");
-  const [input, setInput] = useState<string>("");
-  const [fromUnit, setFromUnit] = useState<string>("");
-  const [toUnit, setToUnit] = useState<string>("");
-  const [result, setResult] = useState<string | null>(null);
-  const [stepTxt, setStepTxt] = useState<string>("");
-  const [err, setErr] = useState<string>("");
+export default function UnitConverter() {
+  const [department, setDepartment] = useState('Length');
+  const [inputUnit, setInputUnit] = useState('m');
+  const [outputUnit, setOutputUnit] = useState('km');
+  const [inputValue, setInputValue] = useState('');
+  const [result, setResult] = useState('');
+  const [steps, setSteps] = useState<string[]>([]);
 
   useEffect(() => {
-    const keys = Object.keys(departments[dept].units);
-    setFromUnit(keys[0]);
-    setToUnit(keys[1] || keys[0]);
-    setInput("");
-    setResult(null);
-    setStepTxt("");
-    setErr("");
-  }, [dept]);
+    try {
+      if (typeof window !== 'undefined' && (window as any).adsbygoogle) {
+        (window as any).adsbygoogle.push({});
+      }
+    } catch (err) {
+      console.error('AdSense error:', err);
+    }
+  }, [department]);
 
   const handleConvert = () => {
-    setErr("");
-    setResult(null);
-    setStepTxt("");
+    const dept = departments[department];
+    const value = parseFloat(inputValue);
 
-    if (fromUnit === toUnit) {
-      setErr("❌ 'From' and 'To' units must be different.");
+    if (isNaN(value) || (!dept.allowNegative && value < 0)) {
+      setResult('Invalid input.');
+      setSteps([]);
       return;
     }
 
-    const num = parseFloat(input.trim());
-    if (isNaN(num)) {
-      setErr("❌ Please enter a valid number.");
-      return;
-    }
+    let converted: number;
+    let explanation: string[] = [];
 
-    if (!departments[dept].allowNegative && num < 0) {
-      setErr(`❌ Negative values are not allowed for ${dept}.`);
-      return;
-    }
-
-    let resStr: string, steps: string;
-    if (dept === "Temperature") {
-      const conv = convertTemp(num, fromUnit, toUnit);
-      resStr = `${conv.toFixed(4)} ${toUnit}`;
-      steps = `Step 1: Convert ${num} ${fromUnit} to Celsius.\nStep 2: Convert Celsius to ${toUnit}.`;
+    if (department === 'Temperature') {
+      // Temperature special cases with explanation
+      if (inputUnit === 'C' && outputUnit === 'K') {
+        converted = value + 273.15;
+        explanation = [
+          `Convert Celsius to Kelvin: K = C + 273.15`,
+          `${value}°C + 273.15 = ${converted.toFixed(2)} K`,
+        ];
+      } else if (inputUnit === 'K' && outputUnit === 'C') {
+        converted = value - 273.15;
+        explanation = [
+          `Convert Kelvin to Celsius: C = K - 273.15`,
+          `${value} K - 273.15 = ${converted.toFixed(2)}°C`,
+        ];
+      } else if (inputUnit === 'C' && outputUnit === 'F') {
+        converted = value * 9 / 5 + 32;
+        explanation = [
+          `Convert Celsius to Fahrenheit: F = C × 9/5 + 32`,
+          `${value}°C × 9/5 + 32 = ${converted.toFixed(2)}°F`,
+        ];
+      } else if (inputUnit === 'F' && outputUnit === 'C') {
+        converted = (value - 32) * 5 / 9;
+        explanation = [
+          `Convert Fahrenheit to Celsius: C = (F - 32) × 5/9`,
+          `(${value}°F - 32) × 5/9 = ${converted.toFixed(2)}°C`,
+        ];
+      } else if (inputUnit === 'F' && outputUnit === 'K') {
+        converted = (value - 32) * 5 / 9 + 273.15;
+        explanation = [
+          `Convert Fahrenheit to Kelvin: K = (F - 32) × 5/9 + 273.15`,
+          `(${value}°F - 32) × 5/9 + 273.15 = ${converted.toFixed(2)} K`,
+        ];
+      } else if (inputUnit === 'K' && outputUnit === 'F') {
+        converted = (value - 273.15) * 9 / 5 + 32;
+        explanation = [
+          `Convert Kelvin to Fahrenheit: F = (K - 273.15) × 9/5 + 32`,
+          `(${value} K - 273.15) × 9/5 + 32 = ${converted.toFixed(2)}°F`,
+        ];
+      } else {
+        converted = value;
+        explanation = [`No conversion needed, same units.`];
+      }
     } else {
-      const dep = departments[dept];
-      const baseVal = toBase(num, fromUnit, dep);
-      const finalVal = fromBase(baseVal, toUnit, dep);
-      resStr = `${finalVal.toFixed(6)} ${toUnit}`;
-      steps = `Step 1: 1 ${fromUnit} = ${dep.units[fromUnit]} ${dep.base}.\n` +
-              `Step 2: ${num} ${fromUnit} = ${num} × ${dep.units[fromUnit]} = ${baseVal} ${dep.base}.\n` +
-              `Step 3: 1 ${toUnit} = ${dep.units[toUnit]} ${dep.base}.\n` +
-              `Step 4: ${baseVal} ÷ ${dep.units[toUnit]} = ${finalVal} ${toUnit}`;
+      const baseValue = value * dept.units[inputUnit];
+      converted = baseValue / dept.units[outputUnit];
+      explanation = [
+        `1 ${inputUnit} = ${dept.units[inputUnit]} ${dept.base}`,
+        `${value} ${inputUnit} = ${value} × ${dept.units[inputUnit]} = ${baseValue} ${dept.base}`,
+        `1 ${outputUnit} = ${dept.units[outputUnit]} ${dept.base}`,
+        `So, ${baseValue} ${dept.base} ÷ ${dept.units[outputUnit]} = ${converted} ${outputUnit}`,
+      ];
     }
 
-    setResult(resStr);
-    setStepTxt(steps);
+    setResult(`${converted.toFixed(4)} ${outputUnit}`);
+    setSteps(explanation);
   };
 
-  const unitKeys = Object.keys(departments[dept].units);
+  const handleReset = () => {
+    setInputValue('');
+    setResult('');
+    setSteps([]);
+  };
+
+  // Update units when department changes
+  React.useEffect(() => {
+    const units = Object.keys(departments[department].units);
+    setInputUnit(units[0]);
+    setOutputUnit(units[1] || units[0]);
+    setInputValue('');
+    setResult('');
+    setSteps([]);
+  }, [department]);
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>🌐 Universal Converter</h1>
+    <main className={styles.container}>
+      <Head>
+        <title>Universal Unit Converter</title>
+        <meta name="description" content="Convert units across 17 physical departments." />
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+          crossOrigin="anonymous"
+        ></script>
+      </Head>
 
-      <div className={styles.formColumn}>
-        <label className={styles.label}>Department</label>
-        <select
-          className={styles.select}
-          value={dept}
-          onChange={(e) => setDept(e.target.value)}
-        >
-          {departmentKeys.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
+      <h1>Universal Unit Converter</h1>
+
+      <label>
+        Department:
+        <select value={department} onChange={(e) => setDepartment(e.target.value)}>
+          {Object.keys(departments).map((key) => (
+            <option key={key} value={key}>{key}</option>
           ))}
         </select>
+      </label>
 
-        <label className={styles.label}>From Unit</label>
-        <select
-          className={styles.select}
-          value={fromUnit}
-          onChange={(e) => setFromUnit(e.target.value)}
-        >
-          {unitKeys.map((u) => (
-            <option key={u} value={u}>
-              {u}
-            </option>
+      <label>
+        From:
+        <select value={inputUnit} onChange={(e) => setInputUnit(e.target.value)}>
+          {Object.keys(departments[department].units).map((unit) => (
+            <option key={unit} value={unit}>{unit}</option>
           ))}
         </select>
+      </label>
 
-        <label className={styles.label}>To Unit</label>
-        <select
-          className={styles.select}
-          value={toUnit}
-          onChange={(e) => setToUnit(e.target.value)}
-        >
-          {unitKeys.map((u) => (
-            <option key={u} value={u}>
-              {u}
-            </option>
+      <label>
+        To:
+        <select value={outputUnit} onChange={(e) => setOutputUnit(e.target.value)}>
+          {Object.keys(departments[department].units).map((unit) => (
+            <option key={unit} value={unit}>{unit}</option>
           ))}
         </select>
+      </label>
 
-        <label className={styles.label}>Enter Value</label>
-        <input
-          className={styles.input}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Enter a number"
-        />
+      <input
+        type="number"
+        placeholder="Enter value"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+      />
 
-        <div className={styles.buttonGroup}>
-          <button className={styles.button} onClick={handleConvert}>
-            Convert
-          </button>
-        </div>
-
-        {err && <div className={styles.error}>{err}</div>}
-
-        {result && (
-          <div className={styles.result}>
-            Result: <strong>{result}</strong>
-          </div>
-        )}
-
-        {stepTxt && <pre className={styles.steps}>{stepTxt}</pre>}
+      <div className={styles.buttonGroup}>
+        <button onClick={handleConvert}>Convert</button>
+        <button onClick={handleReset}>Reset</button>
       </div>
-    </div>
+
+      <div className={styles.result}>
+        <h2>Result:</h2>
+        <p>{result}</p>
+      </div>
+
+      <div className={styles.steps}>
+        <h3>Steps:</h3>
+        <ol>
+          {steps.map((step, idx) => (
+            <li key={idx}>{step}</li>
+          ))}
+        </ol>
+      </div>
+
+      {/* Google AdSense Block */}
+      <ins
+        className="adsbygoogle"
+        style={{ display: 'block', marginTop: '1.5rem' }}
+        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+        data-ad-slot="1234567890"
+        data-ad-format="auto"
+        data-full-width-responsive="true"
+      ></ins>
+    </main>
   );
 }

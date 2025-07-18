@@ -1,72 +1,61 @@
 .container {
   max-width: 600px;
-  margin: 3rem auto;
-  padding: 2rem 2.5rem;
+  margin: 2rem auto;
+  padding: 2rem;
   border-radius: 12px;
-  background: linear-gradient(135deg, #e0f7fa, #80deea);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: #f9f9f9;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
 }
 
-.label {
+.container h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.container label {
   display: block;
-  margin-bottom: 0.5rem;
-  font-weight: bold;
-  color: #333;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
 }
 
-.input {
+.container select,
+.container input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.6rem;
+  margin-top: 0.3rem;
   margin-bottom: 1rem;
-  border-radius: 6px;
   border: 1px solid #ccc;
-  color: green;
-  font-weight: bold;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
-.select {
-  width: 100%;
-  padding: 0.5rem;
-  margin-bottom: 1rem;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+.container .buttonGroup {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.button {
-  background-color: #00796b;
+.container button {
+  flex: 1;
+  padding: 0.6rem;
+  background-color: #0070f3;
   color: white;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 1rem;
+}
+
+.container button:hover {
+  background-color: #005bb5;
+}
+
+.container .result {
   margin-top: 1rem;
-}
-
-.button:hover {
-  background-color: #004d40;
-}
-
-.outputBox {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-.resultLabel {
   font-weight: bold;
-  color: #222;
-}
-
-.resultValue {
-  font-weight: bold;
-  color: #00695c;
-}
-
-.step {
-  color: red;
-  font-size: 0.95rem;
-  margin-top: 1rem;
+  color: green;
+  text-align: center;
 }
