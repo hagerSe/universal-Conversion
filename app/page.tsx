@@ -130,7 +130,6 @@ export default function UnitConverter() {
     let explanation: string[] = [];
 
     if (department === 'Temperature') {
-      // Temperature special cases with explanation
       if (inputUnit === 'C' && outputUnit === 'K') {
         converted = value + 273.15;
         explanation = [
@@ -192,7 +191,6 @@ export default function UnitConverter() {
     setSteps([]);
   };
 
-  // Update units when department changes
   React.useEffect(() => {
     const units = Object.keys(departments[department].units);
     setInputUnit(units[0]);
@@ -203,7 +201,7 @@ export default function UnitConverter() {
   }, [department]);
 
   return (
-    <main className={styles.container}>
+    <main className={styles.mainContainer}>
       <Head>
         <title>Universal Unit Converter</title>
         <meta name="description" content="Convert units across 17 physical departments." />
@@ -214,70 +212,96 @@ export default function UnitConverter() {
         ></script>
       </Head>
 
-      <h1>Universal Unit Converter</h1>
+      <div className={styles.converterWrapper}>
+        <div className={styles.inputSection}>
+          <h1 className={styles.title}>Universal Unit Converter</h1>
 
-      <label>
-        Department:
-        <select value={department} onChange={(e) => setDepartment(e.target.value)}>
-          {Object.keys(departments).map((key) => (
-            <option key={key} value={key}>{key}</option>
-          ))}
-        </select>
-      </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              Department:
+              <select
+                className={styles.select}
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+              >
+                {Object.keys(departments).map((key) => (
+                  <option key={key} value={key}>{key}</option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-      <label>
-        From:
-        <select value={inputUnit} onChange={(e) => setInputUnit(e.target.value)}>
-          {Object.keys(departments[department].units).map((unit) => (
-            <option key={unit} value={unit}>{unit}</option>
-          ))}
-        </select>
-      </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              From:
+              <select
+                className={styles.select}
+                value={inputUnit}
+                onChange={(e) => setInputUnit(e.target.value)}
+              >
+                {Object.keys(departments[department].units).map((unit) => (
+                  <option key={unit} value={unit}>{unit}</option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-      <label>
-        To:
-        <select value={outputUnit} onChange={(e) => setOutputUnit(e.target.value)}>
-          {Object.keys(departments[department].units).map((unit) => (
-            <option key={unit} value={unit}>{unit}</option>
-          ))}
-        </select>
-      </label>
+          <div className={styles.formGroup}>
+            <label className={styles.label}>
+              To:
+              <select
+                className={styles.select}
+                value={outputUnit}
+                onChange={(e) => setOutputUnit(e.target.value)}
+              >
+                {Object.keys(departments[department].units).map((unit) => (
+                  <option key={unit} value={unit}>{unit}</option>
+                ))}
+              </select>
+            </label>
+          </div>
 
-      <input
-        type="number"
-        placeholder="Enter value"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-      />
+          <div className={styles.formGroup}>
+            <input
+              className={styles.input}
+              type="number"
+              placeholder="Enter value"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+          </div>
 
-      <div className={styles.buttonGroup}>
-        <button onClick={handleConvert}>Convert</button>
-        <button onClick={handleReset}>Reset</button>
+          <div className={styles.buttonGroup}>
+            <button className={styles.button} onClick={handleConvert}>Convert</button>
+            <button className={styles.button} onClick={handleReset}>Reset</button>
+          </div>
+
+          <ins
+            className="adsbygoogle"
+            style={{ display: 'block', marginTop: '1.5rem' }}
+            data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+            data-ad-slot="1234567890"
+            data-ad-format="auto"
+            data-full-width-responsive="true"
+          ></ins>
+        </div>
+
+        <div className={styles.outputSection}>
+          <div className={styles.result}>
+            <h2 className={styles.subtitle}>Result:</h2>
+            <p className={styles.resultText}>{result}</p>
+          </div>
+
+          <div className={styles.steps}>
+            <h3 className={styles.subtitle}>Steps:</h3>
+            <ol className={styles.stepsList}>
+              {steps.map((step, idx) => (
+                <li key={idx} className={styles.stepItem}>{step}</li>
+              ))}
+            </ol>
+          </div>
+        </div>
       </div>
-
-      <div className={styles.result}>
-        <h2>Result:</h2>
-        <p>{result}</p>
-      </div>
-
-      <div className={styles.steps}>
-        <h3>Steps:</h3>
-        <ol>
-          {steps.map((step, idx) => (
-            <li key={idx}>{step}</li>
-          ))}
-        </ol>
-      </div>
-
-      {/* Google AdSense Block */}
-      <ins
-        className="adsbygoogle"
-        style={{ display: 'block', marginTop: '1.5rem' }}
-        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-        data-ad-slot="1234567890"
-        data-ad-format="auto"
-        data-full-width-responsive="true"
-      ></ins>
     </main>
   );
 }
