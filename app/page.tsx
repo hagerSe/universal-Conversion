@@ -191,7 +191,7 @@ export default function UnitConverter() {
     setSteps([]);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const units = Object.keys(departments[department].units);
     setInputUnit(units[0]);
     setOutputUnit(units[1] || units[0]);
@@ -202,6 +202,11 @@ export default function UnitConverter() {
 
   return (
     <main className={styles.mainContainer}>
+
+
+      <aside>
+        <h1></h1>
+      </aside>
       <Head>
         <title>Universal Unit Converter</title>
         <meta name="description" content="Convert units across 17 physical departments." />

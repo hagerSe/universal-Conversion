@@ -1,6 +1,6 @@
 .mainContainer {
   min-height: 100vh;
-  background-image: url(/background.jpg);
+  background-image: linear-gradient(135deg, #f4e1d2 0%, #d4a4eb 30%, #a3bffa 60%, #f8e1a1 100%);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -14,12 +14,12 @@
   display: flex;
   flex-direction: row;
   gap: 2rem;
-  max-width: 600px; /* Retained from provided CSS, adjustable based on image */
+  max-width: 600px;
   width: 100%;
   margin: 2rem auto;
-  padding: 2rem;
+  padding: 2rem 3rem; /* Increased left and right padding to 3rem for space */
   border-radius: 12px;
-  background: #f9f9f9;
+  background: rgba(255, 255, 255, 0.9); /* Slight transparency to let background show through */
   font-family: Arial, sans-serif;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
 }
@@ -32,7 +32,7 @@
 }
 
 .inputSection .formGroup:first-child {
-  margin-top: 1.5rem; /* Space above Department */
+  margin-top: 1.5rem;
 }
 
 .outputSection {
